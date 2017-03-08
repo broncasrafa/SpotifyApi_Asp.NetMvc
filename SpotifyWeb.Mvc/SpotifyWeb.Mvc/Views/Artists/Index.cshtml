@@ -1,0 +1,154 @@
+﻿
+@{
+    ViewBag.Title = "Artistas";
+}
+<style>
+
+.img-center {
+	margin: 0 auto;
+}
+
+.thumbnail {
+        border: 0px solid #ddd !important;
+    }
+</style>
+
+
+@section scripts {
+    <script type="text/javascript">
+
+        var page = 0;
+        var pageSize = 8;
+        var _inCallback = false;
+
+        $(function () {
+            LoadData();
+        });
+
+        $(window).scroll(function () {
+            if ($(window).scrollTop() == $(document).height() - $(window).height()) {
+                LoadData();
+            }
+        });
+
+        function LoadData() {
+            if (page > -1 && !_inCallback) {
+
+                _inCallback = true;
+
+                $.ajax({
+                    type: 'GET',
+                    url: '/Artists/GetData',
+                    data: {
+                        "page": page,
+                        "pageSize": pageSize
+                    },
+                    dataType: 'json',
+                    success: function (response) {
+                        if (response == null || !response.length > 0) {
+                            page = -1;
+                            return;
+                        }
+
+                        var tableHtml = createTableFromData(response);
+                        $(tableHtml).appendTo("#divResult");
+                        _inCallback = false;
+                        page++;
+                    },
+                    beforeSend: function () {
+                        $("#loading").show();
+                    },
+                    complete: function () {
+                        $("#loading").hide();
+                    },
+                    error: function () {
+                        alert('Error while retrieving data from Spotify Api');
+                    }
+                });
+            }
+        }
+
+        function createTableFromData(response) {
+            var tableHtml = "";
+
+            for (var i = 0; i < response.length; i++) {
+
+                var url = '@Url.Action("ArtistDetails", "Artists")?artistId=' + response[i].id;
+
+                tableHtml += "<div class='col-sm-6 col-md-3' style='width:285px !important; height:360px !important'>";
+                tableHtml += "   <div class='thumbnail'>";
+                tableHtml += "      <a href='" + url + "' class='linkArtist'>";
+                tableHtml += "         <img class='img-responsive' src='" + response[i].images[0].url + "' alt='" + response[i].name + "' width='252' height='252' style='height: 250px !important;'>";
+                tableHtml += "         <input type='hidden' id='hdnArtistId' value='" + response[i].id + "' />";
+                tableHtml += "      </a>";
+                tableHtml += "   </div>";
+                tableHtml += "   <div class='caption' style='padding-left: 9px;'>";
+                tableHtml += "      <h5>" + response[i].name + "</h5>";
+                tableHtml += "      <p>";
+                tableHtml += "         <span style='font-size:9pt; color:#708090'>" + formattedNumbers(response[i].followers.total.toString()) + " followers</span>";
+                tableHtml += "      </p>";
+                tableHtml += "   </div>";
+                tableHtml += "</div>";
+            }
+            return tableHtml;
+        }
+
+        function formattedNumbers(value) {
+            if (value === null)
+                return null;
+
+            var retorno = "";
+
+            var tamanho = parseInt(value.length);
+            
+            switch (tamanho) {
+                case 1: retorno = value; break;
+                case 2: retorno = value; break;
+                case 3: retorno = value; break;
+                case 4: retorno = String.format("{0}.{1}", value.substring(0, tamanho - 3), value.substring(1, 4)); break;
+                case 5: retorno = String.format("{0}.{1}", value.substring(0, tamanho - 3), value.substring(2, 5)); break;
+                case 6: retorno = String.format("{0}.{1}", value.substring(0, tamanho - 3), value.substring(3, 6)); break;
+                case 7: retorno = String.format("{0}.{1}.{2}", value.substring(0, tamanho - 6), value.substring(1, 4), value.substring(4, 7)); break;
+                case 8: retorno = String.format("{0}.{1}.{2}", value.substring(0, tamanho - 6), value.substring(2, 5), value.substring(5, 8)); break;
+                case 9: retorno = String.format("{0}.{1}.{2}", value.substring(0, tamanho - 6), value.substring(3, 6), value.substring(6, 9)); break;
+                case 10: retorno = String.format("{0}.{1}.{2}.{3}", value.substring(0, tamanho - 9), value.substring(1, 4), value.substring(4, 7), value.substring(7, 10)); break;
+                case 11: retorno = String.format("{0}.{1}.{2}.{3}", value.substring(0, tamanho - 9), value.substring(2, 5), value.substring(5, 8), value.substring(8, 11)); break;
+                case 12: retorno = String.format("{0}.{1}.{2}.{3}", value.substring(0, tamanho - 9), value.substring(3, 6), value.substring(6, 9), value.substring(9, 12)); break;
+                case 13: retorno = String.format("{0}.{1}.{2}.{3}.{4}", value.substring(0, tamanho - 12), value.substring(1, 4), value.substring(4, 7), value.substring(7, 10), value.substring(10, 13)); break;
+                default:
+                    retorno = "Not formatted";
+                    break;
+            }
+
+            return retorno;
+        }
+
+        String.format = function () {
+            var s = arguments[0];
+            for (var i = 0; i < arguments.length - 1; i++) {
+                var reg = new RegExp("\\{" + i + "\\}", "gm");
+                s = s.replace(reg, arguments[i + 1]);
+            }
+            return s;
+        }
+    </script>    
+}
+
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Artists</h1>
+    </div>
+</div>
+
+<div class="row" id="divResult"></div>
+
+
+<div class="row" style="display:none" id="loading">
+    <div class="col-sm-12">
+        <div class="text-center">
+            <img src="~/images/ajax-loader.gif" />
+        </div>
+    </div>
+</div>
+
+

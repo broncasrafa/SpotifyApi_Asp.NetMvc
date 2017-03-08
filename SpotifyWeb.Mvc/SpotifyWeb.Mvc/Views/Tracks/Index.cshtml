@@ -1,0 +1,180 @@
+﻿
+@{
+    ViewBag.Title = "Songs";
+}
+
+<style>
+
+    .link { text-decoration: none; color: #2e2f33; }
+    .link a:hover, a:focus { text-decoration: underline; font-weight: bold !important; color: #2e2f33 !important; }
+
+
+</style>
+
+@section scripts {
+    
+    <script type="text/javascript">
+
+        var page = 0;
+        var pageSize = 20;
+        var _inCallback = false;
+
+        $(function () {
+            LoadData();
+        });
+
+        $(window).scroll(function () {
+            if ($(window).scrollTop() == $(document).height() - $(window).height()) {
+
+                LoadData();
+            }
+        });
+
+        function LoadData() {
+            if (page > -1 && !_inCallback) {
+                _inCallback = true;
+
+                $.ajax({
+                    type: 'GET',
+                    url: '/Tracks/GetData',
+                    data: {
+                        "page": page,
+                        "pageSize": pageSize
+                    },
+                    dataType: 'json',
+                    success: function (response) {
+                        if (response == null || !response.length > 0) {
+                            page = -1;
+                            return;
+                        }
+
+                        var tableHtml = createTableFromData(response);
+                        $(tableHtml).appendTo("#result");
+                        _inCallback = false;
+                        page++;
+                    },
+                    beforeSend: function () {
+                        $("#loading").show();
+                    },
+                    complete: function () {
+                        $("#loading").hide();
+                    },
+                    error: function () {
+                        alert('Error while retrieving data from Spotify Api');
+                    }
+                });
+            }
+        }
+
+
+        function createTableFromData(response) {
+
+            var tableHtml = "";
+            
+            for (var i = 0; i < response.length; i++) {
+
+                var urlToArtist = '@Url.Action("GetArtist", "Artists")?artistId=' + response[i].track.artists[0].id;
+                var urlToAlbum = '@Url.Action("GetAlbum", "Albums")?albumId=' + response[i].track.album.id;
+
+                tableHtml += "<tr>";
+                tableHtml += "  <td>" + response[i].track.name.substring(0, 38) + "</td>";
+
+                if (response[i].track.explicito) {
+                    tableHtml += "  <td><span class='custom-label label-transparent' style='font-size: 7pt !important'>EXPLICIT</span></td>";
+                }
+                else {
+                    tableHtml += "  <td>&nbsp;</td>";
+                }
+
+                tableHtml += "  <td><a href= '" + urlToArtist + "' class='link'>" + response[i].track.artists[0].name + "</a></td>";
+                tableHtml += "  <td><a href= '" + urlToAlbum + "' class='link'>" + response[i].track.album.name + "</a></td>";
+                tableHtml += "  <td>" + convertDateTime(response[i].added_at) + "</td>";
+                tableHtml += "  <td>" + formattDurationTrack(response[i].track.duration_ms) + "</td>";
+                tableHtml += "</tr>";
+            }
+
+            return tableHtml;
+        }
+
+        String.format = function () {
+            var s = arguments[0];
+            for (var i = 0; i < arguments.length - 1; i++) {
+                var reg = new RegExp("\\{" + i + "\\}", "gm");
+                s = s.replace(reg, arguments[i + 1]);
+            }
+            return s;
+        }
+
+
+        function convertDateTime(value) {
+            if (value === null)
+                return null;
+
+            var date = value.substring(0, 10);
+
+            var dateSplit = date.split('-');
+
+            return String.format("{0}-{1}-{2}", dateSplit[2], dateSplit[1], dateSplit[0]);
+        }
+
+        function formattDurationTrack(millisec) {
+            var seconds = (millisec / 1000).toFixed(0);
+            var minutes = Math.floor(seconds / 60);
+            var hours = "";
+
+            if (minutes > 59) {
+                hours = Math.floor(minutes / 60);
+                hours = (hours >= 10) ? hours : "0" + hours;
+                minutes = minutes - (hours * 60);
+                minutes = (minutes >= 10) ? minutes : "0" + minutes;
+            }
+
+            seconds = Math.floor(seconds % 60);
+            seconds = (seconds >= 10) ? seconds : "0" + seconds;
+
+            if (hours != "") {
+                return hours + ":" + minutes + ":" + seconds;
+            }
+
+            return minutes + ":" + seconds;
+
+        }
+
+    </script>    
+}
+
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Songs</h1>
+    </div>
+</div>
+
+<div class="row">
+    <table class="table" style="border-bottom: 1px solid #ccc;">
+        <thead>
+            <tr>
+                <th>SONG</th>
+                <th></th>
+                <th>ARTIST</th>
+                <th>ALBUM</th>
+                <th>
+                    <span class="glyphicon glyphicon-calendar" aria-hidden="true"></span>
+                </th>
+                <th>
+                    <span class="glyphicon glyphicon-time" aria-hidden="true"></span>
+                </th>
+            </tr>
+        </thead>
+        <tbody id="result"></tbody>
+    </table>
+</div>
+
+
+<div class="row" style="display:none; padding-top: 30px; padding-bottom: 30px" id="loading">
+    <div class="col-sm-12">
+        <div class="text-center">
+            Por favor, aguarde...<br />
+            <img src="~/images/ajax-loader.gif" />
+        </div>
+    </div>
+</div>

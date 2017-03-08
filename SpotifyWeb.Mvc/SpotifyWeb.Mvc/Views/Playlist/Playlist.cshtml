@@ -1,0 +1,136 @@
+﻿@model IEnumerable<SpotifyWeb.Mvc.Model.PlaylistTrackItem>
+
+@{
+    ViewBag.Title = "Playlist";
+}
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        var page = 1;
+        var _inCallback = false;
+
+        $(window).scroll(function () {
+            if ($(window).scrollTop() == $(document).height() - $(window).height()) {
+
+                LoadTracks();
+            }
+        });
+
+        function LoadTracks() {
+            if (page > -1 && !_inCallback) {
+                _inCallback = true;
+
+                $.ajax({
+                    type: 'GET',
+                    url: '/Playlist/GetTracks',
+                    data: {
+                        "page": page
+                    },
+                    dataType: 'json',
+                    success: function (response) {
+                        if (response == null || !response.length > 0) {
+                            page = -1;
+                            return;
+                        }
+                        var tableHtml = createTableFromData(response);
+                        $(tableHtml).appendTo('#divResult');
+                        _inCallback = false;
+                        page++;
+                    },
+                    beforeSend: function () {
+                        $('#loading').show();
+                    },
+                    complete: function () {
+                        $('#loading').hide();
+                    },
+                    error: function () {
+                        alert('Error while retrieving data from Spotify Api');
+                    }
+                });
+
+            }
+        }
+
+        function createTableFromData(data) {
+            var tableHtml = "";
+
+            for (var i = 0; i < data.length; i++) {
+                tableHtml += "      <tr>";
+                tableHtml += "          <td>" + data[i].track.name + "</td>";
+                tableHtml += "          <td>" + data[i].track.artists[0].name + "</td>";
+                tableHtml += "          <td>" + data[i].track.album.name + "</td>";
+                tableHtml += "          <td>" + data[i].track.TrackDurationFormatted + "</td>";
+                tableHtml += "      </tr>";
+            }
+
+            return tableHtml;
+        }
+    </script>
+
+}
+
+<div class="row">
+
+    <div class="col-xs-6 col-md-4">
+        <div style="">
+            <img src="@ViewBag.Image" alt="@ViewBag.PlaylistName" class="img-responsive .center-block img-circle">
+        </div>
+    </div>
+
+    <div class="col-xs-12 col-sm-6 col-md-8" style="margin-top: 50px;">
+        <h1>
+            @ViewBag.PlaylistName
+        </h1>
+        <p class="lead">
+            Followers: @ViewBag.Followers
+        </p>
+        <p class="lead">
+            Owner: @ViewBag.Owner
+        </p>
+        <p class="lead">
+            Tracks: @ViewBag.Tracks
+        </p>
+        <p class="lead">
+            Public: @ViewBag.Publico
+        </p>
+    </div>
+</div>
+<br />
+<br />
+<!-- Lista de Musicas -->
+<div class="row">
+    <table class="table table-condensed table-hover table-responsive">
+        <thead>
+            <tr>
+                <th>SONG</th>
+                <th>ARTIST</th>
+                <th>ALBUM</th>
+                <th>
+                    <span class="glyphicon glyphicon-time" aria-hidden="true"></span>
+                </th>
+            </tr>
+        </thead>
+        <tbody id="divResult">
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.track.name</td>
+                    <td>@item.track.artists[0].name</td>
+                    <td>@item.track.album.name</td>
+                    <td>@item.track.TrackDurationFormatted</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<div class="row" style="display:none; padding-top: 30px; padding-bottom: 30px" id="loading">
+    <div class="col-sm-12">
+        <div class="text-center">
+            Por favor, aguarde...<br />
+            <img src="~/images/ajax-loader.gif" />
+        </div>
+    </div>
+</div>

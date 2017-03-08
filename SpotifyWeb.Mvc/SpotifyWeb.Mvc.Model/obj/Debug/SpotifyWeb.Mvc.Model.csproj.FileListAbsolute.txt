@@ -1,0 +1,7 @@
+C:\Users\rfrancisco\Source\Repos\SpotifyApi-Mvc\SpotifyWeb.Mvc\SpotifyWeb.Mvc.Model\bin\Debug\SpotifyWeb.Mvc.Model.dll
+C:\Users\rfrancisco\Source\Repos\SpotifyApi-Mvc\SpotifyWeb.Mvc\SpotifyWeb.Mvc.Model\bin\Debug\SpotifyWeb.Mvc.Model.pdb
+C:\Users\rfrancisco\Source\Repos\SpotifyApi-Mvc\SpotifyWeb.Mvc\SpotifyWeb.Mvc.Model\bin\Debug\Newtonsoft.Json.dll
+C:\Users\rfrancisco\Source\Repos\SpotifyApi-Mvc\SpotifyWeb.Mvc\SpotifyWeb.Mvc.Model\bin\Debug\Newtonsoft.Json.xml
+C:\Users\rfrancisco\Source\Repos\SpotifyApi-Mvc\SpotifyWeb.Mvc\SpotifyWeb.Mvc.Model\obj\Debug\SpotifyWeb.Mvc.Model.csprojResolveAssemblyReference.cache
+C:\Users\rfrancisco\Source\Repos\SpotifyApi-Mvc\SpotifyWeb.Mvc\SpotifyWeb.Mvc.Model\obj\Debug\SpotifyWeb.Mvc.Model.dll
+C:\Users\rfrancisco\Source\Repos\SpotifyApi-Mvc\SpotifyWeb.Mvc\SpotifyWeb.Mvc.Model\obj\Debug\SpotifyWeb.Mvc.Model.pdb

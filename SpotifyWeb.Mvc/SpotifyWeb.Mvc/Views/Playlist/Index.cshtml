@@ -1,0 +1,128 @@
+﻿@{
+    ViewBag.Title = "Home";
+}
+
+
+@section scripts {
+    
+    <script type="text/javascript">
+        var page = 0;
+        var pageSize = 3;
+        var _inCallback = false;
+
+        $(function () {
+            LoadData();
+        });
+
+        $(window).scroll(function () {
+            if ($(window).scrollTop() == $(document).height() - $(window).height()) {
+
+                LoadData();
+            }
+        });
+
+        function LoadData() {
+            if (page > -1 && !_inCallback) {
+                _inCallback = true;
+
+                $.ajax({
+                    type: 'GET',
+                    url: '/Playlist/GetPlaylists',
+                    data: {
+                        "page": page,
+                        "pageSize": pageSize
+                    },
+                    dataType: 'json',
+                    success: function (response) {
+                        if (response == null || !response.length > 0) {
+                            page = -1;
+                            return;
+                        }
+
+                        var tableHtml = createTableFromData(response);
+                        $(tableHtml).appendTo("#result");
+                        _inCallback = false;
+                        page++;
+                    },
+                    beforeSend: function () {
+                        $("#loading").show();
+                    },
+                    complete: function () {
+                        $("#loading").hide();
+                    },
+                    error: function () {
+                        alert('Error while retrieving data from Spotify Api');
+                    }
+                });
+            }
+        }
+
+        function createTableFromData(response) {
+            var tableHtml = "";
+            
+            for (var i = 0; i < response.length; i++) {
+
+                var urlTracks = '@Url.Action("Playlist", "Playlist")?id=' + response[i].id;
+                var urlExportar = '@Url.Action("ExportToExcel", "Playlist")?id=' + response[i].id;
+                
+                if (i % 2 == 0) {
+                    tableHtml += "<div class='row'> <div class='featurette'>";
+                    tableHtml += "	<div class='col-md-7 col-md-push-5'>";
+                    tableHtml += "		<h2 class='featurette-heading'>" + response[i].name + "</h2>";
+                    tableHtml += "		<p class='lead'>";
+                    tableHtml += response[i].tracks.total > 1 ? response[i].tracks.total + "  musics" : response[i].tracks.total + "  music";
+                    tableHtml += "		</p>";
+                    tableHtml += "		<p class='lead'>";
+                    tableHtml += "          <a href='" + urlTracks + "' class='btn btn-primary btn-sm' role='button'>View</a> &nbsp;&nbsp;";
+                    tableHtml += "          <a href='" + urlExportar + "' class='btn btn-green btn-sm' role='button'>Exportar</a>";
+                    tableHtml += "		</p>";
+                    tableHtml += "	</div>";
+                    tableHtml += "	<div class='col-md-5 col-md-pull-7'>";
+                    tableHtml += "		<img class='featurette-image img-responsive center-block' src='" + response[i].images[0].url + "' alt='" + response[i].name + "' />";
+                    tableHtml += "	</div>";
+                    tableHtml += "</div></div>";
+                }
+                else {
+                    tableHtml += "<div class='row'> <div class='featurette'>";
+                    tableHtml += "	<div class='col-md-7'>";
+                    tableHtml += "		<h2 class='featurette-heading'>" + response[i].name + "</h2>";
+                    tableHtml += "		<p class='lead'>";
+                    tableHtml += response[i].tracks.total > 1 ? response[i].tracks.total + "  musics" : response[i].tracks.total + "  music";
+                    tableHtml += "		</p>";
+                    tableHtml += "		<p class='lead'>";
+                    tableHtml += "          <a href='" + urlTracks + "' class='btn btn-primary btn-sm' role='button'>View</a> &nbsp;&nbsp;";
+                    tableHtml += "          <a href='" + urlExportar + "' class='btn btn-green btn-sm' role='button'>Exportar</a>";
+                    tableHtml += "		</p>";
+                    tableHtml += "	</div>";
+                    tableHtml += "	<div class='col-md-5'>";
+                    tableHtml += "		<img class='featurette-image img-responsive center-block' src='" + response[i].images[0].url + "' alt='" + response[i].name + "' />";
+                    tableHtml += "	</div>";
+                    tableHtml += "</div></div>";
+                }
+
+                tableHtml += "<hr class='featurette-divider'>";
+            }
+
+            return tableHtml;
+        }
+
+    </script>
+        
+}
+
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Playlists</h1>
+    </div>
+</div>
+
+<div class="row" id="result"></div>
+
+<div class="row" style="display:none; padding-top: 30px; padding-bottom: 30px" id="loading">
+    <div class="col-sm-12">
+        <div class="text-center">
+            Por favor, aguarde...<br />
+            <img src="~/images/ajax-loader.gif" />
+        </div>
+    </div>
+</div>

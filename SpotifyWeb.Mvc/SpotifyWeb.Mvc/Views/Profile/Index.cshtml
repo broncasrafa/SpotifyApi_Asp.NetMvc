@@ -1,0 +1,62 @@
+﻿@model SpotifyWeb.Mvc.Model.UserProfiles
+
+@{
+    ViewBag.Title = "Profile";
+}
+
+<style>
+
+    .featurette-divider {
+      margin: 80px 0;
+    }
+
+    /* Thin out the marketing headings */
+    .featurette-heading {
+      font-weight: 300;
+      line-height: 1;
+      letter-spacing: -1px;
+    }
+
+    
+
+</style>
+
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Minha conta</h1>
+    </div>
+</div>
+
+
+<div class="row featurette">
+    <div class="col-md-4">
+        <h2 class="featurette-heading">
+            @Model.display_name 
+            <span class="text-muted">- @Model.product</span>            
+        </h2>
+        <p>
+            <span class="text-muted">Username</span>
+        </p>
+        <p class="lead">@Model.id</p>
+
+        <p>
+            <span class="text-muted">Email</span>
+        </p>
+        <p class="lead">@Model.email</p>
+
+        <p>
+            <span class="text-muted">Data de Nascimento</span>
+        </p>
+        <p class="lead">@ViewBag.Aniversario</p>
+
+        <p>
+            <span class="text-muted">País</span>
+        </p>
+        <p class="lead">@ViewBag.Pais</p>        
+    </div>
+    <div class="col-md-8">
+        <img class="featurette-image img-responsive img-circle center-block" src="@Model.images[0].url" alt="Generic placeholder image" width="300" height="300" />
+    </div>
+</div>
+
+<hr class="featurette-divider">

@@ -1,0 +1,110 @@
+﻿
+@{
+    ViewBag.Title = "Saved Albums";
+}
+
+<style>
+    .thumbnail {
+        border: 0px solid #ddd !important;
+    }
+</style>
+
+@section scripts {
+    <script type="text/javascript">
+
+        var page = 0;
+        var pageSize = 20;
+        var _inCallback = false;
+
+        $(function () {
+            LoadData();
+        });
+
+        $(window).scroll(function () {
+            if ($(window).scrollTop() == $(document).height() - $(window).height()) {
+
+                LoadData();
+            }
+        });
+
+        function LoadData() {
+            if (page > -1 && !_inCallback) {
+                _inCallback = true;
+
+                $.ajax({
+                    type: 'GET',
+                    url: '/Albums/GetSavedAlbums',
+                    data: {
+                        "page": page,
+                        "pageSize": pageSize
+                    },
+                    dataType: 'json',
+                    success: function (response) {
+                        if (response == null || !response.length > 0) {
+                            page = -1;
+                            return;
+                        }
+
+                        var tableHtml = createTableFromData(response);
+                        $(tableHtml).appendTo("#result");
+                        _inCallback = false;
+                        page++;
+                    },
+                    beforeSend: function () {
+                        $("#loading").show();
+                    },
+                    complete: function () {
+                        $("#loading").hide();
+                    },
+                    error: function () {
+                        alert('Error while retrieving data from Spotify Api');
+                    }
+                });
+            }
+        }
+
+        function createTableFromData(response) {
+            var tableHtml = "";
+
+            for (var i = 0; i < response.length; i++) {
+
+                var url = '@Url.Action("GetSavedAlbumDetails", "Albums")?albumId=' + response[i].album.id;
+
+                tableHtml += "<div class='col-sm-6 col-md-3' style='width:285px !important; height:360px !important'>";
+                tableHtml += "   <div class='thumbnail'>";
+                tableHtml += "      <a href='" + url + "'>";
+                tableHtml += "         <img class='img-responsive' src='" + response[i].album.images[0].url + "' alt='" + response[i].album.name + "' width='252' height='252' style='height: 250px !important;'>";
+                tableHtml += "         <input type='hidden' id='hdnAlbumId' value='" + response[i].album.id + "' />";
+                tableHtml += "      </a>";
+                tableHtml += "   </div>";
+                tableHtml += "   <div class='caption' style='padding-left: 9px;'>";
+                tableHtml += "      <h5>" + response[i].album.name + "</h5>";
+                tableHtml += "      <p>";
+                tableHtml += "         <span style='font-size:9pt; color:#708090'>" + response[i].album.artists[0].name + "</span>";
+                tableHtml += "      </p>";
+                tableHtml += "   </div>";
+                tableHtml += "</div>";
+            }
+
+            return tableHtml;
+        }
+
+    </script>
+}
+
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Saved Albums</h1>
+    </div>
+</div>
+
+<div class="row" id="result"></div>
+
+<div class="row" style="display:none; padding-top: 30px; padding-bottom: 30px" id="loading">
+    <div class="col-sm-12">
+        <div class="text-center">
+            Por favor, aguarde...<br />
+            <img src="~/images/ajax-loader.gif" />
+        </div>
+    </div>
+</div>

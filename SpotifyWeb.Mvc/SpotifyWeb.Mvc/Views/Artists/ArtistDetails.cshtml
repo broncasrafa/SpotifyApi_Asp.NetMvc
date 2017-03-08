@@ -1,0 +1,774 @@
+﻿
+@{
+    ViewBag.Title = "Artist Details";
+}
+
+<style>
+
+.box.box-success {
+    border-top-color: #00a65a;
+}
+
+.box {
+    position: relative;
+    border-radius: 3px;
+    background: #ffffff;
+    border-top: 3px solid #d2d6de;
+    margin-bottom: 20px;
+    width: 100%;    
+}
+
+.box-body { 
+    border-bottom-right-radius:0;
+    border-bottom-left-radius:0;
+    position:relative;
+    overflow-x:hidden;
+    padding:0;
+    max-height:300px;
+    overflow:auto
+}
+
+.box-header {
+    color: #444;
+    display: block;
+    padding: 10px;
+    position: relative;
+}
+
+.box-header .box-title {
+    display: inline-block;
+    font-size: 18px;
+    margin: 0;
+    line-height: 1;
+}
+
+.popularTd { padding: 0px !important; vertical-align: middle !important; }
+.relatedArtistsTd { vertical-align: middle !important; }
+
+.tr1 { border-bottom: 1px solid #eee; }
+.td2 { padding-bottom: 5px !important; }
+
+
+.custom-label {
+    display: inline;
+    padding: .2em .6em .3em;
+    font-size: 75%;
+    font-weight: bold;
+    line-height: 1;
+    color: #ccc;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: .25em;
+}
+.label-transparent {
+  background-color: transparent;
+  border: 1px solid #ccc;
+}
+.label-transparent[href]:hover,
+.label-transparent[href]:focus {
+  background-color: #5e5e5e;
+}
+</style>
+
+<div class="row">
+    <div class='col-lg-12' id="artist">
+        <div style="display:none" id="loading0">
+            <div class="col-sm-12">
+                <div class="text-center">
+                    <img src="~/images/spin.gif" /> carregando...
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Popular -->
+    <section class="col-lg-8">
+        <div class="box box-success" style="position: relative; left: 0px; top: 0px;">
+            <div class="box-header">
+                <h3 class="box-title">Popular</h3>
+            </div>
+            <div class="box-body" id="popularDiv">
+                <div>
+                    <table class="table table-condensed">
+                        <thead>
+                            <tr class="tr1">
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="popular"></tbody>
+                    </table>
+                </div>
+                <div style="display:none" id="loading1">
+                    <div class="col-sm-12">
+                        <div class="text-center">
+                            <img src="~/images/spin.gif" /> carregando...
+                        </div>
+                    </div>
+                </div>
+            </div>            
+        </div>
+    </section>
+
+    <!-- Related Artists -->
+    <section class="col-lg-4">
+        <div class="box box-success">
+            <div class="box-header">
+                <h3 class="box-title">Related Artists</h3>
+            </div>
+            <div class="box-body" id="relatedArtistsDiv">                    
+                <div>
+                    <table class="table table-condensed relatedArtists">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="relatedArtists"></tbody>
+                    </table>
+                </div>
+                <div style="display:none" id="loading2">
+                    <div class="col-sm-12">
+                        <div class="text-center">
+                            <img src="~/images/spin.gif" /> carregando...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Albums -->
+    <section class="col-lg-12">
+        <div class="box box-success">
+            <div class="box-header">
+                <h3 class="box-title">Albums</h3>                
+            </div>
+            <div class="box-body" id="albumsDiv">
+                <div style="display:none" id="loading3">
+                    <div class="col-sm-12" style="padding-top: 15px; padding-bottom: 15px;">
+                        <div class="text-center">
+                            <img src="~/images/spin.gif" /> carregando...
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row" style="padding-top: 30px">
+                <div class="col-lg-12">
+                    <div class="text-center">
+                        <button id="btnAlbums" class="btn btn-default btn-sm">View</button>
+                    </div>
+                </div>
+            </div>
+            
+
+        </div>
+    </section>
+
+    <!-- Singles -->
+    <section class="col-lg-12">
+        <div class="box box-success">
+            <div class="box-header">
+                <h3 class="box-title">Singles</h3>
+            </div>
+            <div class="box-body" id="singlesDiv">
+                <div style="display:none" id="loading4">
+                    <div class="col-sm-12">
+                        <div class="text-center">
+                            <img src="~/images/spin.gif" /> carregando...
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row" style="padding-top: 30px">
+                <div class="col-lg-12">
+                    <div class="text-center">
+                        <button id="btnSingles" class="btn btn-default btn-sm">View</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Appears On -->
+    <section class="col-lg-12">
+        <div class="box box-success">
+            <div class="box-header">
+                <h3 class="box-title">Appears On</h3>
+                
+            </div>
+            <div class="box-body" id="appearsOnDiv">
+                <div style="display:none" id="loading5">
+                    <div class="col-sm-12">
+                        <div class="text-center">
+                            <img src="~/images/spin.gif" /> carregando...
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row" style="padding-top: 30px">
+                <div class="col-lg-12">
+                    <div class="text-center">
+                        <button id="btnAppearsOn" class="btn btn-default btn-sm">View</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Compilations -->
+    <section class="col-lg-12">
+        <div class="box box-success">
+            <div class="box-header">
+                <h3 class="box-title">Compilation</h3>
+                
+            </div>
+            <div class="box-body" id="compilationsDiv">
+                <div style="display:none" id="loading6">
+                    <div class="col-sm-12">
+                        <div class="text-center">
+                            <img src="~/images/spin.gif" /> carregando...
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row" style="padding-top: 30px">
+                <div class="col-lg-12">
+                    <div class="text-center">
+                        <button id="btnCompilations" class="btn btn-default btn-sm">View</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+</div>
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        $(function () {
+            $('#popularDiv').slimScroll();
+            $('#relatedArtistsDiv, #albumsDiv, #singlesDiv, #appearsOnDiv, #compilationsDiv').slimScroll({
+                allowPageScroll: true
+            });
+
+            LoadArtist();
+            LoadPopular();
+            LoadRelatedArtists();
+        });
+
+        var pageSize = 20;
+
+        var pageAlbums = 0;
+        var pageSingles = 0;
+        var pageAppearsOn = 0;
+        var pageCompilations = 0;
+
+        var _inCallbackAlbums = false;
+        var _inCallbackSingles = false;
+        var _inCallbackAppearsOn = false;
+        var _inCallbackCompilations = false;
+
+        $("#btnAlbums").click(function () {
+            if (pageAlbums > -1 && !_inCallbackAlbums) {
+                _inCallbackAlbums = true;
+
+                $.ajax({
+                    type: 'GET',
+                    url: '/Artists/GetArtistAlbums',
+                    data: {
+                        "page": pageAlbums,
+                        "pageSize": pageSize
+                    },
+                    dataType: 'json',
+                    success: function (response) {
+                        if (response == null || !response.length > 0) {
+                            pageAlbums = -1;
+                            return;
+                        }
+
+                        if (response.Message == "Fim") {
+                            pageSingles = -1;
+                            $('#btnAlbums').hide();
+                            return;
+                        }
+
+                        var tableHtml = createTableAlbums(response);
+                        $(tableHtml).appendTo('#albumsDiv');
+
+                        _inCallbackAlbums = false;
+                        pageAlbums++;
+                    },
+                    beforeSend: function () {
+                        $('#loading3').show();
+                    },
+                    complete: function (response) {
+//                        console.log("[RETORNO COMPLETE]: " + response.responseText);
+                        $('#loading3').hide();
+                    },
+                    error: function (response) {
+                        console.log("[RETORNO ERROR]: " + response.responseText);
+                        alert('Error while retrieving data from Spotify Api');
+                    }
+                });
+            }
+        });
+
+        $("#btnSingles").click(function () {
+
+            if (pageSingles > -1 && !_inCallbackSingles) {
+                _inCallbackSingles = true;
+
+                $.ajax({
+                    type: 'GET',
+                    url: '/Artists/GetArtistSingles',
+                    data: {
+                        "page": pageSingles,
+                        "pageSize": pageSize
+                    },
+                    dataType: 'json',
+                    success: function (response) {
+                        if (response == null || !response.length > 0) {
+                            pageSingles = -1;
+                            return;
+                        }
+
+                        if (response.Message == "Fim") {
+                            pageSingles = -1;
+                            $('#btnSingles').hide();
+                            return;
+                        }
+
+                        var tableHtml = createTableAlbums(response);
+                        $(tableHtml).appendTo('#singlesDiv');
+
+                        _inCallbackSingles = false;
+                        pageSingles++;
+                    },
+                    beforeSend: function () {
+                        $('#loading4').show();
+                    },
+                    complete: function () {
+                        $('#loading4').hide();
+                    },
+                    error: function () {
+                        alert('Error while retrieving data from Spotify Api');
+                    }
+                });
+            }
+
+        });
+
+        $("#btnAppearsOn").click(function () {
+            if (pageAppearsOn > -1 && !_inCallbackAppearsOn) {
+                _inCallbackAppearsOn = true;
+
+                $.ajax({
+                    type: 'GET',
+                    url: '/Artists/GetArtistAppearsOn',
+                    data: {
+                        "page": pageAppearsOn,
+                        "pageSize": pageSize
+                    },
+                    dataType: 'json',
+                    success: function (response) {
+                        if (response == null || !response.length > 0) {
+                            pageAppearsOn = -1;
+                            return;
+                        }
+
+                        if (response.Message == "Fim") {
+                            pageSingles = -1;
+                            $('#btnAppearsOn').hide();
+                            return;
+                        }
+
+                        var tableHtml = createTableAlbums(response);
+                        $(tableHtml).appendTo('#appearsOnDiv');
+
+                        _inCallbackAppearsOn = false;
+                        pageAppearsOn++;
+                    },
+                    beforeSend: function () {
+                        $('#loading5').show();
+                    },
+                    complete: function () {
+                        $('#loading5').hide();
+                    },
+                    error: function () {
+                        alert('Error while retrieving data from Spotify Api');
+                    }
+                });
+            }
+        });
+
+        $("#btnCompilations").click(function () {
+            if (pageCompilations > -1 && !_inCallbackCompilations) {
+                _inCallbackCompilations = true;
+
+                $.ajax({
+                    type: 'GET',
+                    url: '/Artists/GetArtistCompilations',
+                    data: {
+                        "page": pageCompilations,
+                        "pageSize": pageSize
+                    },
+                    dataType: 'json',
+                    success: function (response) {
+                        if (response == null || !response.length > 0) {
+                            pageCompilations = -1;
+                            return;
+                        }
+
+                        if (response.Message == "Fim") {
+                            pageSingles = -1;
+                            $('#btnCompilations').hide();
+                            return;
+                        }
+
+                        var tableHtml = createTableAlbums(response);
+                        $(tableHtml).appendTo('#compilationsDiv');
+
+                        _inCallbackCompilations = false;
+                        pageCompilations++;
+                    },
+                    beforeSend: function () {
+                        $('#loading6').show();
+                    },
+                    complete: function () {
+                        $('#loading6').hide();
+                    },
+                    error: function () {
+                        alert('Error while retrieving data from Spotify Api');
+                    }
+                });
+            }
+        });
+
+        function LoadArtist() {
+            $.ajax({
+                type: 'GET',
+                url: '/Artists/GetArtist',
+                dataType: 'json',
+                success: function (response) {
+                    if (response == null) {
+                        return;
+                    }
+
+                    var tableHtml = createTableArtist(response);
+                    $(tableHtml).appendTo('#artist');
+                },
+                beforeSend: function () {
+                    $('#loading0').show();
+                },
+                complete: function () {
+                    $('#loading0').hide();
+                },
+                error: function () {
+                    alert('Error while retrieving data from Spotify Api');
+                }
+            });
+        }
+        function LoadPopular() {
+            $.ajax({
+                type: 'GET',
+                url: '/Artists/GetPopularTracks',
+                dataType: 'json',
+                success: function (response) {
+                    if (response == null || !response.length > 0) {
+                        return;
+                    }
+
+                    var tableHtml = createTablePopular(response);
+                    $(tableHtml).appendTo('#popular');
+                },
+                beforeSend: function () {
+                    $('#loading1').show();
+                },
+                complete: function () {
+                    $('#loading1').hide();
+                },
+                error: function () {
+                    alert('Error while retrieving data from Spotify Api');
+                }
+            });
+        }
+        function LoadRelatedArtists() {
+            $.ajax({
+                type: 'GET',
+                url: '/Artists/GetRelatedArtists',
+                dataType: 'json',
+                success: function (response) {
+                    if (response == null || !response.length > 0) {
+                        return;
+                    }
+
+                    var tableHtml = createTableRelatedArtists(response);
+                    $(tableHtml).appendTo('#relatedArtists');
+                },
+                beforeSend: function () {
+                    $('#loading2').show();
+                },
+                complete: function () {
+                    $('#loading2').hide();
+                },
+                error: function () {
+                    alert('Error while retrieving data from Spotify Api');
+                }
+            });
+        }
+
+        /* Html Tables Strings */
+        function createTableArtist(response) {
+            var htmlString = "";
+            htmlString += "   <h1 class='page-header'>" + response.name + "</h1>";
+
+            return htmlString;
+        }
+        function createTablePopular(response) {
+
+            var htmlString = "";
+
+            for (var i = 0; i < response.length; i++) {
+                var url = '@Url.Action("Album", "Albums")?albumId=' + response[i].album.id;
+                htmlString += "<tr class='tr1'>";
+                htmlString += "     <td style='width: 60px;' class='popularTd'>";
+                htmlString += "         <a href='"+ url + "'>";
+                htmlString += "             <img class='img img-responsive' src='" + response[i].album.images[0].url + "' alt='" + response[i].album.name + "' width='40' height='40' /> ";
+                htmlString += "         </a>";
+                htmlString += "     </td>";
+                htmlString += "     <td class='popularTd'>" + response[i].track_number + "</td>";
+                htmlString += "     <td class='popularTd'>" + response[i].name + "</td>";
+                if (response[i].explicito)
+                {
+                    htmlString += " <td class='popularTd'>";
+                    htmlString += "     <span class='custom-label label-transparent' style='font-size: 8pt !important'>EXPLICIT</span>";
+                    htmlString += " </td>";
+                }
+                else
+                {
+                    htmlString += " <td class='popularTd'>&nbsp;</td>";
+                }
+                htmlString += "     <td class='popularTd'>" + response[i].TrackDurationFormatted + "</td>";
+                htmlString += "</tr>";
+            }
+
+            return htmlString;
+        }
+        function createTableRelatedArtists(response) {
+            var htmlString = "";
+
+            for (var i = 0; i < response.length; i++) {
+                var url = '@Url.Action("ArtistDetails", "Artists")?artistId=' + response[i].id;
+                htmlString += "<tr>";
+                htmlString += "	  <td style='width: 60px;' class='td2'>";
+                htmlString += "	  	 <img class='img img-circle img-responsive' src='" + response[i].images[0].url + "' alt='" + response[i].name + "' width='40' height='40' />";
+                htmlString += "	  </td>";
+                htmlString += "	  <td class='relatedArtistsTd'>";
+                htmlString += "       <a href='" + url + "' style='color: #000;'>"+ response[i].name + "</a>";
+                htmlString += "	  </td>";
+                htmlString += "</tr>";
+            }
+
+            return htmlString;
+        }
+        function createTableAlbums(response) {
+            var htmlString = "";
+
+            for (var i = 0; i < response.length; i++) {
+                htmlString += "<div class='col-sm-2'>";
+                htmlString += "	  <img src='" + response[i].images[0].url + "' class='img img-responsive' width='150' height='150' alt='" + response[i].name + "' />";
+                htmlString += "</div>";
+                htmlString += "<div class='col-sm-10'>" + response[i].release_date.substring(0, 4) + "<br />";
+                htmlString += "	  <h2>" + response[i].name + "</h2>";
+                htmlString += "</div>";
+                htmlString += "<div class='col-md-12'>";
+                htmlString += "	  <table class='table table-condensed'>";
+                htmlString += "	  	  <thead>";
+                htmlString += "	  		 <tr>";
+                htmlString += "	  			<th>#</th>";
+                htmlString += "	  			<th>SONG</th>";
+                htmlString += "	  			<th></th>";
+                htmlString += "	  			<th><span class='glyphicon glyphicon-time' aria-hidden='true'></span></th>";
+                htmlString += "	  		 </tr>";
+                htmlString += "	  	  </thead>";
+                htmlString += "	  	  <tbody>";
+                for (var j = 0; j < response[i].tracks.items.length; j++) {
+                    htmlString += "     <tr>";
+                    htmlString += "	        <td>" + response[i].tracks.items[j].track_number + "</td>";
+                    htmlString += "	        <td>" + response[i].tracks.items[j].name + "</td>";
+                    if (response[i].tracks.items[j].explicito) {
+                        htmlString += "		<td>";
+                        htmlString += "			<span class='custom-label label-transparent' style='font-size: 8pt !important'>EXPLICIT</span>";
+                        htmlString += "		</td>";
+                    }
+                    else {
+                        htmlString += "		<td>&nbsp;</td>";
+                    }
+                    htmlString += "	        <td>" + formatTime(response[i].tracks.items[j].duration_ms) + "</td>";
+                    htmlString += "     </tr>";
+                }
+                htmlString += "		  </tbody>";
+                htmlString += "	  </table>";
+                htmlString += "</div>";
+            }
+
+            return htmlString;
+        }
+        /*
+        function createTableSingles(response) {
+            var htmlString = "";
+
+            for (var i = 0; i < response.length; i++) {
+                htmlString += "<div class='col-sm-2'>";
+                htmlString += "		<img src='" + response[i].album.images[0].url + "' class='img img-responsive' width='150' height='150' alt='" + response[i].album.name + "' />";
+                htmlString += "	</div>";
+                htmlString += "	<div class='col-sm-10'>" + response[i].album.release_date.Substring(0, 4) + "<br />";
+                htmlString += "		<h2>" + response[i].album.name + "</h2>";
+                htmlString += "	</div>";
+                htmlString += "	<div class='col-md-12'>";
+                htmlString += "		<table class='table table-condensed'>";
+                htmlString += "			<thead>";
+                htmlString += "				<tr>";
+                htmlString += "					<th>#</th>";
+                htmlString += "					<th>SONG</th>";
+                htmlString += "					<th></th>";
+                htmlString += "					<th><span class='glyphicon glyphicon-time' aria-hidden='true'></span></th>";
+                htmlString += "				</tr>";
+                htmlString += "			</thead>";
+                htmlString += "			<tbody>";
+                for (var j = 0; j < response[i].album.tracks.items.length; j++) {
+                    htmlString += "		    <tr>";
+                    htmlString += "			    <td>" + track[j].track_number + "</td>";
+                    htmlString += "				<td>" + track[j].name + "</td>";
+                    if (track[j].explicito) {
+                        htmlString += "	        <td>";
+                        htmlString += "	        	<span class='custom-label label-transparent' style='font-size: 8pt !important'>EXPLICIT</span>";
+                        htmlString += "	        </td>";
+                    }
+                    else {
+                        htmlString += "	        <td>&nbsp;</td>";
+                    }
+                    htmlString += "             <td>" + track[j].track_duration_formatted + "</td>";
+                    htmlString += "         </tr>";
+                }
+                htmlString += "			</tbody>";
+                htmlString += "		</table>";
+                htmlString += "	</div>";
+            }
+
+            return htmlString;
+        }
+        function createTableAppearsOn(response) {
+            var htmlString = "";
+
+            for (var i = 0; i < response.length; i++) {
+                htmlString += "<div class='col-sm-2'>";
+                htmlString += "	<img src='" + response[i].album.images[0].url + "' class='img img-responsive' width='150' height='150' alt='" + response[i].album.name + "' />";
+                htmlString += "</div>";
+                htmlString += "<div class='col-sm-10'>" + response[i].album.release_date.Substring(0, 4) + "<br />";
+                htmlString += "	<h2>" + response[i].album.name + "</h2>";
+                htmlString += "</div>";
+                htmlString += "<div class='col-md-12'>";
+                htmlString += "	<table class='table table-condensed'>";
+                htmlString += "		<thead>";
+                htmlString += "			<tr>";
+                htmlString += "				<th>#</th>";
+                htmlString += "				<th>SONG</th>";
+                htmlString += "				<th></th>";
+                htmlString += "				<th><span class='glyphicon glyphicon-time' aria-hidden='true'></span></th>";
+                htmlString += "			</tr>";
+                htmlString += "		</thead>";
+                htmlString += "		<tbody>";
+                for (var j = 0; j < response[i].album.tracks.items.length; j++) {
+                    htmlString += "	    <tr>";
+                    htmlString += "	    	<td>" + track[j].track_number + "</td>";
+                    htmlString += "	    	<td>" + track[j].name + "</td>";
+                    if (track[j].explicito) {
+                        htmlString += "		<td>";
+                        htmlString += "			<span class='custom-label label-transparent' style='font-size: 8pt !important'>EXPLICIT</span>";
+                        htmlString += "		</td>";
+                    }
+                    else {
+                        htmlString += "		<td>&nbsp;</td>";
+                    }
+                    htmlString += "			<td>" + track[j].track_duration_formatted + "</td>";
+                    htmlString += "		</tr>";
+                }
+                htmlString += "		</tbody>";
+                htmlString += "	</table>";
+                htmlString += "</div>";
+            }
+
+            return htmlString;
+        }
+        function createTableCompilations(response) {
+            var htmlString = "";
+
+            for (var i = 0; i < response.length; i++) {
+                htmlString += "<div class='col-sm-2'>";
+                htmlString += "	    <img src='" + response[i].album.images[0].url + "' class='img img-responsive' width='150' height='150' alt='" + response[i].album.name + "' />";
+                htmlString += "</div>";
+                htmlString += "<div class='col-sm-10'>" + response[i].album.release_date.Substring(0, 4) + "<br />";
+                htmlString += "	    <h2>" + response[i].album.name + "</h2>";
+                htmlString += "</div>";
+                htmlString += "<div class='col-md-12'>";
+                htmlString += "	    <table class='table table-condensed'>";
+                htmlString += "	    	<thead>";
+                htmlString += "	    		<tr>";
+                htmlString += "	    			<th>#</th>";
+                htmlString += "	    			<th>SONG</th>";
+                htmlString += "	    			<th></th>";
+                htmlString += "	    			<th><span class='glyphicon glyphicon-time' aria-hidden='true'></span></th>";
+                htmlString += "	    		</tr>";
+                htmlString += "	    	</thead>";
+                htmlString += "	    	<tbody>";
+                for (var j = 0; j < response[i].album.tracks.items.length; j++) {
+                    htmlString += "		    <tr>";
+                    htmlString += "			    <td>" + track[j].track_number + "</td>";
+                    htmlString += "				<td>" + track[j].name + "</td>";
+                    if (track[j].explicito)
+                    {
+                        htmlString += "			<td>";
+                        htmlString += "				<span class='custom-label label-transparent' style='font-size: 8pt !important'>EXPLICIT</span>";
+                        htmlString += "			</td>";
+                    }
+                    else
+                    {
+                        htmlString += "			<td>&nbsp;</td>";
+                    }
+                    htmlString += "				<td>" + track[j].track_duration_formatted + "</td>";
+                    htmlString += "			</tr>";
+                    }
+                htmlString += "		</tbody>";
+                htmlString += "	</table>";
+                htmlString += "</div>";
+            }
+
+            return htmlString;
+        }
+        */
+
+        function formatTime(duration) {
+            var milliseconds = parseInt((duration % 1000) / 100)
+                , seconds = parseInt((duration / 1000) % 60)
+                , minutes = parseInt((duration / (1000 * 60)) % 60)
+                , hours = parseInt((duration / (1000 * 60 * 60)) % 24);
+
+            hours = (hours < 10) ? "0" + hours : hours;
+            minutes = (minutes < 10) ? "0" + minutes : minutes;
+            seconds = (seconds < 10) ? "0" + seconds : seconds;
+
+            return minutes + ":" + seconds;
+        }
+</script>    
+}

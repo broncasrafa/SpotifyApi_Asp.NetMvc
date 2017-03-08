@@ -1,0 +1,90 @@
+﻿@model SpotifyWeb.Mvc.ViewModel.AlbumDetailsViewModel
+
+@{
+    ViewBag.Title = "AlbumDetails";
+}
+
+<style>
+
+.custom-label {
+    display: inline;
+    padding: .2em .6em .3em;
+    font-size: 75%;
+    font-weight: bold;
+    line-height: 1;
+    color: #ccc;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: .25em;
+}
+.label-transparent {
+  background-color: transparent;
+  border: 1px solid #ccc;
+}
+.label-transparent[href]:hover,
+.label-transparent[href]:focus {
+  background-color: #5e5e5e;
+}
+
+</style>
+
+<div class="row">        
+    <div class="col-md-3">
+        <img src="@Model.ImageUrl" alt="@Model.AlbumName" class="img-responsive .center-block" width="200" height="200">
+    </div>
+    <div class="col-md-9">
+        <h1>
+            @Model.AlbumName
+        </h1>
+    </div>    
+</div>
+
+<div class="row" style="margin-top: 30px; border-bottom: 1px solid #ccc; padding-bottom: 10px;">
+    <div class="col-lg-12">
+        By <b>@Model.ArtistName</b> - @Model.ReleaseDate - @Model.TracksCount songs @*, @Model.ExtendedDuration*@
+    </div>
+</div>
+<div class="row" style="margin-top: 15px;">
+    <table class="table" style="border-bottom: 1px solid #ccc;">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>SONG</th>
+                <th></th>
+                <th>                    
+                    <span class="glyphicon glyphicon-time" aria-hidden="true"></span>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach(var music in Model.Tracks)
+            {
+                <tr>
+                    <td>@music.track_number</td>
+                    <td>@music.name</td>
+                    @if (@music.explicito)
+                    {
+                        <td>
+                            <span class="custom-label label-transparent" style="font-size: 8pt !important">EXPLICIT</span>
+                        </td>
+                    }
+                    else
+                    {
+                        <td>&nbsp;</td>
+                    }
+                    <td>@music.track_duration_formatted</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<div class="row" style="margin-top: 15px;">
+    <div class="col-lg-12">
+        @foreach(var copyright in Model.Copyrights)
+        {
+            @copyright.text
+            <br />
+        }
+    </div>
+</div>    
